@@ -224,3 +224,93 @@ html, body {
     font-size: 0.9rem;
   }
   
+  /* 봇 메시지 컨텐츠 컨테이너 */
+.bot-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* 감정 태그 스타일 */
+.emotion-tag {
+  display: inline-block;
+  font-size: 0.85em;
+  background-color: #f0f8ff;
+  border-radius: 12px;
+  padding: 2px 8px;
+  margin-top: 4px;
+  color: #0066cc;
+  border: 1px solid #b8d4f5;
+  align-self: flex-start;
+}
+
+/* 힌트 메시지 스타일 */
+.hint-message {
+  margin-top: 6px;
+  padding: 5px 10px;
+  background-color: #e6f7ff;
+  border-radius: 6px;
+  border-left: 3px solid #1890ff;
+  font-size: 0.85em;
+  color: #0056b3;
+}
+
+/* 로딩 메시지 스타일 */
+.loading .bot-text {
+  display: flex;
+  align-items: center;
+}
+
+.loading .bot-text::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background-color: #888;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+/* 이벤트 컨테이너 스타일 */
+.event-container {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #28a745;
+}
+
+.event-container h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.1em;
+  color: #28a745;
+}
+
+.event-container p {
+  margin: 0 0 10px 0;
+}
+
+/* 선택지 목록 스타일 */
+.choices-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.choices-list li {
+  padding: 8px 12px;
+  margin: 5px 0;
+  background-color: #e9f7ef;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.choices-list li:hover {
+  background-color: #d4edda;
+}

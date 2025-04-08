@@ -106,6 +106,7 @@ def api_chat():
         elif bot_id == 4:
             from generation.chatbot4 import generate_response
             reply = generate_response(user_message)
+            return jsonify(reply)
         else:
             return jsonify({'error': 'Invalid bot id'}), 400
 
