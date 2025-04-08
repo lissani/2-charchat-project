@@ -314,3 +314,31 @@ html, body {
 .choices-list li:hover {
   background-color: #d4edda;
 }
+
+.stat-bar {
+  background-color: #eee;
+  height: 10px;
+  border-radius: 5px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.stat-bar-fill {
+  height: 10px;
+  background-color: #4CAF50;
+  border-radius: 5px;
+  width: 0%;
+  transition: width 0.3s ease-in-out;
+}
+.bot-content ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+.bot-content li {
+  margin: 4px 0;
+  font-size: 14px;
+}
+.bot-content p {
+  font-weight: bold;
+  margin: 8px 0 4px 0;
+}

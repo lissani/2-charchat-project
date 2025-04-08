@@ -29,6 +29,8 @@ class AllosChat:
 자신이 어떤 전공을 선택할지 고민 중입니다.
 선배에게 존대말을 사용하며, 친근하고 호기심 많은 어투를 유지합니다."""
         
+        self.is_first_interaction = True  # 최초 상호작용 여부
+
         # 대화 기록
         self.messages = [{"role": "system", "content": self.system_message}]
         self.last_emotion_result = None
@@ -212,7 +214,7 @@ class AllosChat:
         """이벤트 데이터를 초기화합니다."""
         return {
             "자율전공입학": {
-                "description": "알로스는 서강대학교 자율전공으로 입학했습니다. 캠퍼스 투어로 어디부터 가볼까",
+                "description": "알로스는 서강대학교 자율전공으로 입학했습니다. 캠퍼스 투어로 어디부터 가볼까요?",
                 "choices": ["R관", "J관", "GA관", "GN관", "D관", "청광"]
             },
             "수강과목선택": {
@@ -348,10 +350,11 @@ class AllosChat:
         return event_json
 
     def advance_story(self):
-        """스토리를 다음 단계로 진행합니다."""
+        if self.state["current_event_index"] >= len(self.story_events):
+            return "🎓 스토리가 모두 끝났어요! 다시 하려면 새로고침해주세요."
         # 현재 이벤트에서 선택을 했는지 확인
         if not self.state["current_choice_made"]:
-            return "현재 이벤트에서 선택을 먼저 해야 다음 스토리로 진행할 수 있습니다. '/선택 [번호]'를 입력해주세요."
+            return "현재 이벤트에서 선택을 먼저 해야 다음 스토리로 진행할 수 있습니다. 원하는 선택지를 선택해주세요."
         
         # 다음 이벤트로 이동
         self.state["current_event_index"] += 1
@@ -418,36 +421,29 @@ class AllosChat:
         return result
 
     def show_status(self):
-        """현재 상태를 표시합니다."""
         current_event = self.story_events[self.state["current_event_index"]]
-        
-        status_text = "\n===== 현재 상태 =====\n"
-        status_text += f"현재 이벤트: {current_event}\n"
-        status_text += f"선택 완료 여부: {'예' if self.state['current_choice_made'] else '아니오'}\n"
-        
-        status_text += "\n선택 내역:\n"
-        for event, choice_info in self.state["choices_history"].items():
-            status_text += f"- {event}: {choice_info['choice']}\n"
-        
-        status_text += "\n전공 스탯:\n"
-        for major, value in self.state["major_stats"].items():
-            status_text += f"- {major}: {value}\n"
-        status_text += "===================\n"
-        
-        return status_text
+        return {
+            "type": "status",
+            "current_event": current_event,
+            "current_event_index": self.state["current_event_index"],
+            "current_choice_made": self.state["current_choice_made"],
+            "choices_history": self.state["choices_history"],
+            "major_stats": self.state["major_stats"]
+        }
+
         
     def show_help(self):
-        """도움말을 표시합니다."""
-        help_text = "\n===== 도움말 =====\n"
-        help_text += "- 일반 대화: 그냥 메시지 입력\n"
-        help_text += "- 스토리 진행: '/스토리' 입력\n"
-        help_text += "- 선택하기: '/선택 [번호]' 입력 (예: '/선택 1')\n"
-        help_text += "- 현재 상태 확인: '/상태' 입력\n"
-        help_text += "- 도움말 보기: '/도움말' 입력\n"
-        help_text += "- 종료하기: '/종료' 입력\n"
-        help_text += "===================\n"
-        
-        return help_text
+        return {
+            "type": "help",
+            "commands": [
+                {"command": "/스토리", "description": "스토리 진행", "example": "/스토리"},
+                {"command": "/선택 [번호]", "description": "선택하기", "example": "/선택 1"},
+                {"command": "/상태", "description": "현재 상태 확인", "example": "/상태"},
+                {"command": "/도움말", "description": "도움말 보기", "example": "/도움말"},
+                {"command": "/종료", "description": "챗봇 종료", "example": "/종료"}
+            ]
+        }
+
         
     def generate_ai_response(self, user_input):
         """AI 응답을 생성하고 감정 분석을 수행합니다."""
@@ -557,68 +553,86 @@ def get_allos_chat_instance():
             raise
     return _allos_chat_instance
 
-# 메인 응답 생성 함수 (app.py에서 호출됨)
 def generate_response(user_message):
-    """사용자 메시지에 대한 응답을 생성합니다."""
     try:
         allos = get_allos_chat_instance()
+
+        # ✅ 최초 상호작용이라면 안내 멘트만 리턴하고 종료
+        if allos.is_first_interaction:
+            allos.is_first_interaction = False
+            return {
+                "type": "intro",
+                "text": {
+                    "title": "안녕하세요, 선배님! 저는 서강대학교 자율전공 새내기 '알로스'에요 🐣",
+                    "description": "💡 챗봇 사용법",
+                    "commands": [
+                        { "label": "/스토리", "desc": "알로스의 대학 생활을 함께 진행해요!" },
+                        { "label": "/상태", "desc": "지금까지의 선택과 전공 스탯을 볼 수 있어요" },
+                        { "label": "/도움말", "desc": "사용 가능한 명령어들을 안내해드려요" },
+                        { "label": "/종료", "desc": "챗봇을 종료해요" }
+                    ]
+                }
+            }
         
-        # 명령어인지 확인
+        # 명령어일 때
         if user_message.startswith('/'):
-            response_data, emotion_analysis = allos.process_command(user_message)
-            
-            # 이미 JSON 형식으로 반환된 경우 그대로 사용
+            response_data, _ = allos.process_command(user_message)
+
             if isinstance(response_data, dict):
-                # emotion 정보 추가
-                if 'emotion' not in response_data and allos.last_emotion_result:
+                allowed_emotion_types = ["chat", "command"]
+
+                if (
+                    allos.last_emotion_result
+                    and response_data.get("type") in allowed_emotion_types
+                    and not user_message.startswith("/")
+                ):
                     response_data['emotion'] = {
                         "dominant_emotion": allos.last_emotion_result["dominant_emotion"],
                         "confidence": allos.last_emotion_result["confidence"],
                         "emoji": get_emotion_emoji(allos.last_emotion_result["dominant_emotion"])
                     }
+
+                # text 필드 중복 방지
+                if 'text' in response_data and isinstance(response_data['text'], dict):
+                    response_data.update(response_data['text'])
+                    del response_data['text']
+
                 return response_data
+            
             else:
-                # 문자열인 경우 JSON으로 변환
                 return {
                     "type": "command",
                     "text": response_data,
                     "emotion": None
                 }
-            
-        else:
-            # 일반 대화 처리
-            response, emotion_analysis = allos.generate_ai_response(user_message)
-            
-            # 현재 이벤트 및 선택 상태에 대한 힌트 추가
-            hint = None
 
-            # 현재 이벤트 및 선택 상태에 대한 힌트 추가
+        # 일반 대화일 때
+        else:
+            response, _ = allos.generate_ai_response(user_message)
+
+            hint = None
             if allos.state["current_event_index"] < len(allos.story_events):
                 current_event = allos.story_events[allos.state["current_event_index"]]
-                
                 if allos.state["current_choice_made"]:
                     hint = f"'{current_event}' 이벤트에서 선택을 완료했습니다. '/스토리'를 입력하여 다음 이벤트로 진행할 수 있습니다."
                 else:
                     hint = f"'{current_event}' 이벤트에서 선택이 필요합니다. '/선택 [번호]'를 입력해주세요."
-            
-            
-            # 감정 데이터 가져오기
+
             emotion_data = None
-            if allos.last_emotion_result:
+            if allos.last_emotion_result and allos.should_display_image(allos.last_emotion_result):
                 emotion_data = {
                     "dominant_emotion": allos.last_emotion_result["dominant_emotion"],
                     "confidence": allos.last_emotion_result["confidence"],
                     "emoji": get_emotion_emoji(allos.last_emotion_result["dominant_emotion"])
                 }
-            
-            # JSON 응답 구조
+
             return {
                 "type": "chat",
                 "text": response,
                 "emotion": emotion_data,
                 "hint": hint
             }
-    
+
     except Exception as e:
         return {
             "type": "error",
