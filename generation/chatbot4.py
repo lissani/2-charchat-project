@@ -6,7 +6,6 @@ from langchain_openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain.prompts import ChatPromptTemplate
-from PIL import Image
 import openai
 
 # AllosChat 클래스 정의
@@ -186,21 +185,20 @@ class AllosChat:
                 
         return formatted_text
 
-    def display_emotion_image(self, emotion):
-        """감정에 해당하는 이미지를 표시합니다."""
+    # display_emotion_image 함수 대신 이를 사용
+    def get_emotion_image_data(self, emotion):
+        """감정에 따른 이미지 데이터를 반환합니다."""
         try:
-            # 현재 디렉토리 기준으로 pic 폴더의 이미지 경로 생성
-            image_path = os.path.join("pic", f"{emotion}.jpg")
-            # 파일이 존재하는지 확인
-            if os.path.exists(image_path):
-                # 이미지 열기 및 표시
-                img = Image.open(image_path)
-                img.show()  # 기본 이미지 뷰어로 열기
-                print(f"이미지를 표시했습니다: {image_path}")
-            else:
-                print(f"해당 감정의 이미지 파일이 존재하지 않습니다: {image_path}")
+            # 감정에 따른 이미지 경로 생성
+            image_path = f"/static/images/chatbot4/emotions/{emotion}.jpg"
+            
+            return {
+                "image_url": image_path,
+                "emotion": emotion
+            }
         except Exception as e:
-            print(f"이미지 표시 중 오류가 발생했습니다: {e}")
+            print(f"이미지 데이터 생성 중 오류: {e}")
+            return None
     
     def get_emotion_image_html(self, emotion):
         """감정에 따른 이미지 HTML 태그를 반환합니다."""
@@ -368,7 +366,7 @@ class AllosChat:
                     "type": "story",
                     "text": f"🎓 '{event_info['name']}' 이벤트를 시작합니다!",
                     "event": event_info,
-                    "image_url": f"/static/images/story/{event_info['name']}.jpg"
+                    "image_url": f"/static/images/chatbot4/story/{event_info['name']}.jpg"
                 }
             else:
                 return {
@@ -390,7 +388,7 @@ class AllosChat:
             "type": "story",
             "text": f"✅ '{new_event}' 이벤트가 시작되었습니다.",
             "event": event_info,
-            "image_url": f"/static/images/story/{new_event}.jpg"
+            "image_url": f"/static/images/chatbot4/story/{new_event}.jpg"
         }
     
     def process_choice(self, choice_num):
@@ -431,7 +429,27 @@ class AllosChat:
         stats = self.state["major_stats"]
         self.story_finished = True
         final_major = max(stats, key=stats.get)
+        all_zero_or_negative = all(value <= 0 for value in stats.values())
+        if all_zero_or_negative:
+            final_major = "반수"
+            
+            # 반수 선택 기록
+            self.state["choices_history"]["최종전공"] = {"choice": final_major}
+            self.update_ai_context()
 
+            final_major_message = (
+                f"[시스템: 알로스는 최종적으로 서강대학교를 떠나 '{final_major}'를 결정했습니다. "
+                "앞으로의 대화에서 이 정보를 인지하고 참조하세요.]"
+            )
+            self.messages.append({"role": "system", "content": final_major_message})
+            
+            return {
+                "type": "ending",
+                "final_major": final_major,
+                "final_stats": stats,
+                "text": "🎓 알로스는 어떤 전공도 마음에 들지 않아 결국 서강대학교를 떠나 다른 학교로 반수하기로 결정했습니다!",
+                "image_url": "/static/images/chatbot4/ending/반수.jpg"  # 반수 엔딩용 이미지 필요
+            }
         # 최종 전공 기록
         self.state["choices_history"]["최종전공"] = {"choice": final_major}
         self.update_ai_context()
@@ -441,13 +459,21 @@ class AllosChat:
             "앞으로의 대화에서 이 정보를 인지하고 참조하세요.]"
         )
         self.messages.append({"role": "system", "content": final_major_message})
-
+        # 전공별 이미지 경로 설정 (확장자 포함)
+        major_images = {
+            "공과자연": "/static/images/chatbot4/ending/공과자연.jpg",  # 실제 이미지 파일명에 맞게 수정
+            "인문": "/static/images/chatbot4/ending/인문.jpg",         # 실제 이미지 파일명에 맞게 수정
+            "지융미": "/static/images/chatbot4/ending/지융미.jpg",      # 실제 이미지 파일명에 맞게 수정
+            "경영경제": "/static/images/chatbot4/ending/경영경제.jpg",   # 실제 이미지 파일명에 맞게 수정
+            "사회과학": "/static/images/chatbot4/ending/사회과학.jpg"    # 실제 이미지 파일명에 맞게 수정
+        }
+        image_url = major_images.get(final_major, f"/static/images/ending/{final_major}.jpg")
         return {
             "type": "ending",
             "final_major": final_major,
             "final_stats": stats,
             "text": f"🎓 축하합니다! 알로스는 '{final_major}' 전공을 선택했습니다!",
-            "image_url": f"/static/images/ending/{final_major}.jpg"
+            "image_url": image_url
         }
 
     def show_status(self):
@@ -536,8 +562,25 @@ class AllosChat:
                 "choices_history": self.state["choices_history"],
                 "major_stats": self.state["major_stats"]
             }, ""
-            
+        elif user_input.lower() == "/start":
+            print("시작 명령어 감지: /start")
+            # 첫 상호작용 메시지 강제 반환
+            self.is_first_interaction = True  # 명시적으로 첫 상호작용 상태로 설정
+            return {
+                "type": "intro",
+                "text": {
+                    "title": "안녕하세요, 선배님! 저는 서강대학교 자율전공 새내기 '알로스'에요 🐣",
+                    "description": "💡 챗봇 사용법",
+                    "commands": [
+                        { "label": "/스토리", "desc": "알로스의 대학 생활을 함께 진행해요!" },
+                        { "label": "/상태", "desc": "지금까지의 선택과 전공 스탯을 볼 수 있어요" },
+                        { "label": "/도움말", "desc": "사용 가능한 명령어들을 안내해드려요" },
+                        { "label": "/종료", "desc": "챗봇을 종료해요" }
+                    ]
+                }
+            }, ""
         elif user_input.lower() == "/스토리":
+            self.is_first_interaction = False
             result = self.advance_story()
             return result, ""  # 항상 튜플 반환 보장
             
@@ -592,7 +635,7 @@ def get_allos_chat_instance():
 def generate_response(user_message):
     try:
         allos = get_allos_chat_instance()
-
+        allos.is_first_interaction = False
         # ✅ 최초 상호작용이라면 안내 멘트만 리턴하고 종료
         if allos.is_first_interaction:
             allos.is_first_interaction = False

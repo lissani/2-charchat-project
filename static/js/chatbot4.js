@@ -259,7 +259,11 @@ function appendBotMessage(data) {
     const imageElem = document.createElement('img');
     imageElem.src = data.image_url;
     imageElem.alt = "관련 이미지";
+    // 이미지 크기 제한 설정 (핵심 수정 부분)
     imageElem.classList.add('chat-image');
+    imageElem.style.width = '50%'; 
+    imageElem.style.display = 'block';
+    imageElem.style.margin = '10px auto';
     messageContainer.appendChild(imageElem);
   }
 
@@ -311,8 +315,53 @@ document.querySelectorAll('.modal-close').forEach(btn => {
 });
 
 // 첫 진입 환영 메시지
+// 첫 진입 환영 메시지
+// 첫 진입 환영 메시지
+// 첫 진입 환영 메시지
+// 첫 진입 환영 메시지 - 다음 코드로 변경
+// 첫 진입 환영 메시지 - 다음 코드로 변경
 document.addEventListener('DOMContentLoaded', () => {
   if (botId == 4) {
-    appendMessage('bot', '안녕하세요, 선배님! 저는 서강대 자율전공 새내기 알로스에요. 대학 생활에 대해 궁금한 것이 있으시면 물어봐주세요!');
+    // 간단한 방식: 직접 인트로 메시지 생성 및 표시
+    const introElement = document.createElement('div');
+    introElement.classList.add('message', 'bot');
+    
+    const messageContainer = document.createElement('div');
+    messageContainer.classList.add('bot-content');
+    
+    const titleDiv = document.createElement('div');
+    titleDiv.classList.add('bot-text');
+    titleDiv.innerText = "안녕하세요, 선배님! 저는 서강대학교 자율전공 새내기 '알로스'에요 🐣";
+    messageContainer.appendChild(titleDiv);
+    
+    const desc = document.createElement('p');
+    desc.textContent = "💡 챗봇 사용법";
+    messageContainer.appendChild(desc);
+    
+    const ul = document.createElement('ul');
+    const commands = [
+      { label: "/스토리", desc: "알로스의 대학 생활을 함께 진행해요!" },
+      { label: "/상태", desc: "지금까지의 선택과 전공 스탯을 볼 수 있어요" },
+      { label: "/도움말", desc: "사용 가능한 명령어들을 안내해드려요" },
+      { label: "/종료", desc: "챗봇을 종료해요" }
+    ];
+    
+    commands.forEach(cmd => {
+      const li = document.createElement('li');
+      li.textContent = `${cmd.label}: ${cmd.desc}`;
+      ul.appendChild(li);
+    });
+    messageContainer.appendChild(ul);
+    
+    introElement.appendChild(messageContainer);
+    chatLog.appendChild(introElement);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    
+    // 서버에 /start 명령 전송 (백그라운드에서)
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: parseInt(botId), message: "/start" })
+    });
   }
 });

@@ -369,5 +369,48 @@
       document.body.appendChild(scriptTag);
     }
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const chatArea = document.querySelector('.chat-area');
+      const botId = chatArea.dataset.botId;
+      
+      if (botId == 4) {
+        // 채팅 로그 영역 찾기
+        const chatLog = document.getElementById('chat-log');
+        
+        // 환영 메시지 추가
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message bot';
+        msgDiv.innerHTML = `
+          <div class="bot-content">
+            <div class="bot-text">안녕하세요 선배님! (✨꾸벅) 저, 이번에 자율전공학부로 입학한 새내기 이알로예요! 어디서 많이 본 것 같다구요…? 헤헤, 사실 학교에 좀 오래 있었거든요. (소근소근) 처음이라 모르는 것도 많고, 캠퍼스도 너무 넓고 신기해서… 혹시 괜찮으시다면, 선배님께 이것저것 여쭤봐도 될까요?<br>
+            🗺<strong>캠퍼스 투어부터 시작해서</strong><br>
+            📝<strong>수강신청 고민 상담이나</strong><br>
+            🔖<strong>시험기간 꿀팁 전수</strong><br>
+            아니면 그냥 수다도 좋아요!<br>
+            오늘부터 제… 서강 생활 생존 멘토, 해주실 수 있나요 선배님? (ˊᵕˋ)੭</div>
+            <p>💡 챗봇 사용법</p>
+            <ul>
+              <li>/스토리: 알로스의 대학 생활을 함께 진행해요!</li>
+              <li>/상태: 지금까지의 선택과 전공 스탯을 볼 수 있어요</li>
+              <li>/도움말: 사용 가능한 명령어들을 안내해드려요</li>
+              <li>/종료: 챗봇을 종료해요</li>
+            </ul>
+            <p style="color: #9264d1; font-weight: bold; margin-top: 15px; text-align: center; padding: 10px; border: 2px dashed #9264d1; border-radius: 8px;">
+    👉 <strong>"/스토리"</strong> 명령어를 입력하여 알로스의 대학 생활 스토리를 시작해보세요!
+            </p>
+          </div>
+        `;
+        chatLog.appendChild(msgDiv);
+        
+        // 서버에 상태 동기화 요청
+        fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: parseInt(botId), message: "/start" })
+        });
+      }
+    });
+  </script>
 </body>
 </html>
