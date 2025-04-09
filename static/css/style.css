@@ -342,3 +342,11 @@ html, body {
   font-weight: bold;
   margin: 8px 0 4px 0;
 }
+.message.bot .bot-text.info {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+.message.bot .bot-text.error {
+  background-color: #ffebee;
+  color: #c62828;
+}

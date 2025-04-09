@@ -1,7 +1,6 @@
 // chat-area에서 bot_id와 bot_image_url 정보 꺼내기
 const chatArea = document.querySelector('.chat-area');
 const botId = chatArea.dataset.botId;
-const botImageUrl = chatArea.dataset.botImageUrl;
 
 // 주요 DOM 요소
 const chatLog = document.getElementById('chat-log');
@@ -23,7 +22,6 @@ async function sendMessage() {
 
   const botImg = document.createElement('img');
   botImg.classList.add('bot-big-img');
-  botImg.src = botImageUrl;
   botImg.alt = "챗봇 이미지";
 
   const loadingText = document.createElement('div');
@@ -72,7 +70,6 @@ function appendMessage(sender, text) {
   } else {
     const botImg = document.createElement('img');
     botImg.classList.add('bot-big-img');
-    botImg.src = botImageUrl;
     botImg.alt = "챗봇 이미지";
 
     const messageText = document.createElement('div');
@@ -87,64 +84,103 @@ function appendMessage(sender, text) {
   chatLog.scrollTop = chatLog.scrollHeight;
 }
 
-// 구조화된 JSON 응답 처리
 function appendBotMessage(data) {
   const messageElem = document.createElement('div');
   messageElem.classList.add('message', 'bot');
 
-  const botImg = document.createElement('img');
-  botImg.classList.add('bot-big-img');
-  botImg.src = botImageUrl;
-  botImg.alt = "챗봇 이미지";
-  messageElem.appendChild(botImg);
-
   const messageContainer = document.createElement('div');
   messageContainer.classList.add('bot-content');
 
-  const messageText = document.createElement('div');
-  messageText.classList.add('bot-text');
-  if (data.text) messageText.textContent = data.text;
-  messageContainer.appendChild(messageText);
-
+  // === intro 구조 ===
   if (data.type === 'intro' && typeof data.text === 'object') {
-  const { title, description, commands } = data.text;
+    const { title, description, commands } = data.text;
 
-  const messageElem = document.createElement('div');
-  messageElem.classList.add('message', 'bot');
+    const titleDiv = document.createElement('div');
+    titleDiv.classList.add('bot-text');
+    titleDiv.innerText = title;
+    messageContainer.appendChild(titleDiv);
 
-  const botImg = document.createElement('img');
-  botImg.classList.add('bot-big-img');
-  botImg.src = botImageUrl;
-  botImg.alt = "챗봇 이미지";
-  messageElem.appendChild(botImg);
+    const desc = document.createElement('p');
+    desc.textContent = description;
+    messageContainer.appendChild(desc);
 
-  const contentDiv = document.createElement('div');
-  contentDiv.classList.add('bot-content');
+    const ul = document.createElement('ul');
+    commands.forEach(cmd => {
+      const li = document.createElement('li');
+      li.textContent = `${cmd.label}: ${cmd.desc}`;
+      ul.appendChild(li);
+    });
+    messageContainer.appendChild(ul);
+  }
 
-  const titleDiv = document.createElement('div');
-  titleDiv.classList.add('bot-text');
-  titleDiv.innerText = title;
-  contentDiv.appendChild(titleDiv);
+  // === 엔딩 ===
+  else if (data.type === 'ending') {
+    if (data.choice_text) {
+      const choiceMsg = document.createElement('div');
+      choiceMsg.classList.add('bot-text');
+      choiceMsg.textContent = data.choice_text;
+      messageContainer.appendChild(choiceMsg);
+    }
 
-  const desc = document.createElement('p');
-  desc.textContent = description;
-  contentDiv.appendChild(desc);
+    const resultText = document.createElement('div');
+    resultText.classList.add('bot-text');
+    resultText.textContent = data.text;
+    messageContainer.appendChild(resultText);
 
-  const ul = document.createElement('ul');
-  commands.forEach(cmd => {
-    const li = document.createElement('li');
-    li.textContent = `${cmd.label}: ${cmd.desc}`;
-    ul.appendChild(li);
-  });
-  contentDiv.appendChild(ul);
+    if (data.final_stats) {
+      const statList = document.createElement('ul');
+      Object.entries(data.final_stats).forEach(([major, value]) => {
+        const li = document.createElement('li');
+        li.textContent = `${major}: ${value}`;
+        statList.appendChild(li);
+      });
+      messageContainer.appendChild(statList);
+    }
+  }
 
-  messageElem.appendChild(contentDiv);
-  chatLog.appendChild(messageElem);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  return;  // ✅ intro 응답은 여기서 종료
-}
-  // === /도움말 ===
-  if (data.type === 'help') {
+  // === 스토리 ===
+  else if (data.type === 'story') {
+    const storyText = document.createElement('div');
+    storyText.classList.add('bot-text');
+    storyText.textContent = data.text;
+    messageContainer.appendChild(storyText);
+
+    if (data.event) {
+      const eventDiv = document.createElement('div');
+      eventDiv.classList.add('event-container');
+
+      const eventTitle = document.createElement('h3');
+      eventTitle.textContent = data.event.name || '이벤트';
+      eventDiv.appendChild(eventTitle);
+
+      const eventDesc = document.createElement('p');
+      eventDesc.textContent = data.event.description;
+      eventDiv.appendChild(eventDesc);
+
+      if (data.event.choices && data.event.choices.length > 0) {
+        const choicesList = document.createElement('ul');
+        choicesList.classList.add('choices-list');
+
+        data.event.choices.forEach((choice, index) => {
+          const choiceItem = document.createElement('li');
+          choiceItem.textContent = `${index + 1}. ${choice}`;
+          choiceItem.addEventListener('click', () => {
+            userMessageInput.value = `/선택 ${index + 1}`;
+            sendMessage();
+          });
+          choiceItem.style.cursor = 'pointer';
+          choicesList.appendChild(choiceItem);
+        });
+
+        eventDiv.appendChild(choicesList);
+      }
+
+      messageContainer.appendChild(eventDiv);
+    }
+  }
+
+  // === 도움말 ===
+  else if (data.type === 'help') {
     const helpTitle = document.createElement('h4');
     helpTitle.textContent = '도움말 명령어 목록';
     messageContainer.appendChild(helpTitle);
@@ -167,8 +203,8 @@ function appendBotMessage(data) {
     messageContainer.appendChild(commandList);
   }
 
-  // === /상태 ===
-  if (data.type === 'status') {
+  // === 상태 ===
+  else if (data.type === 'status') {
     const statusTitle = document.createElement('h4');
     statusTitle.textContent = '현재 상태';
     messageContainer.appendChild(statusTitle);
@@ -185,7 +221,14 @@ function appendBotMessage(data) {
     const maxStat = Math.max(...Object.values(data.major_stats));
     Object.entries(data.major_stats).forEach(([major, value]) => {
       const li = document.createElement('li');
-      li.innerHTML = `${major}: <div class="stat-bar"><div class="stat-bar-fill" style="width: ${value / maxStat * 100}%"></div></div>`;
+      li.innerHTML = `
+        <div class="stat-row">
+          <span class="stat-major">${major}</span>
+          <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: ${maxStat > 0 ? (value / maxStat * 100) : 0}%"></div>
+          </div>
+        </div>
+      `;
       statsList.appendChild(li);
     });
     messageContainer.appendChild(statsList);
@@ -203,41 +246,24 @@ function appendBotMessage(data) {
     messageContainer.appendChild(choiceList);
   }
 
-  // === 이벤트 정보 ===
-  if (data.event) {
-    const eventDiv = document.createElement('div');
-    eventDiv.classList.add('event-container');
-
-    const eventTitle = document.createElement('h3');
-    eventTitle.textContent = data.event.name || '이벤트';
-    eventDiv.appendChild(eventTitle);
-
-    const eventDesc = document.createElement('p');
-    eventDesc.textContent = data.event.description;
-    eventDiv.appendChild(eventDesc);
-
-    if (data.event.choices && data.event.choices.length > 0) {
-      const choicesList = document.createElement('ul');
-      choicesList.classList.add('choices-list');
-
-      data.event.choices.forEach((choice, index) => {
-        const choiceItem = document.createElement('li');
-        choiceItem.textContent = `${index + 1}. ${choice}`;
-        choiceItem.addEventListener('click', () => {
-          userMessageInput.value = `/선택 ${index + 1}`;
-          sendMessage();
-        });
-        choiceItem.style.cursor = 'pointer';
-        choicesList.appendChild(choiceItem);
-      });
-
-      eventDiv.appendChild(choicesList);
-    }
-
-    messageContainer.appendChild(eventDiv);
+  // === 일반 메시지 ===
+  else if (data.text) {
+    const messageText = document.createElement('div');
+    messageText.classList.add('bot-text');
+    messageText.textContent = data.text;
+    messageContainer.appendChild(messageText);
   }
 
-  // === 감정 이모지 ===
+  // === 이미지 출력 공통 ===
+  if (data.image_url) {
+    const imageElem = document.createElement('img');
+    imageElem.src = data.image_url;
+    imageElem.alt = "관련 이미지";
+    imageElem.classList.add('chat-image');
+    messageContainer.appendChild(imageElem);
+  }
+
+  // === 감정 분석 ===
   if (data.emotion) {
     const emotionDiv = document.createElement('div');
     emotionDiv.classList.add('emotion-tag');
@@ -247,7 +273,7 @@ function appendBotMessage(data) {
     messageContainer.appendChild(emotionDiv);
   }
 
-  // === 힌트 메시지 ===
+  // === 힌트 ===
   if (data.hint) {
     const hintDiv = document.createElement('div');
     hintDiv.classList.add('hint-message');
@@ -259,6 +285,8 @@ function appendBotMessage(data) {
   chatLog.appendChild(messageElem);
   chatLog.scrollTop = chatLog.scrollHeight;
 }
+
+
 
 // 전송 관련 이벤트
 userMessageInput.addEventListener('keyup', (event) => {

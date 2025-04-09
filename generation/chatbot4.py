@@ -30,7 +30,7 @@ class AllosChat:
 선배에게 존대말을 사용하며, 친근하고 호기심 많은 어투를 유지합니다."""
         
         self.is_first_interaction = True  # 최초 상호작용 여부
-
+        self.story_finished = False
         # 대화 기록
         self.messages = [{"role": "system", "content": self.system_message}]
         self.last_emotion_result = None
@@ -350,25 +350,49 @@ class AllosChat:
         return event_json
 
     def advance_story(self):
+        if self.story_finished:
+            return {
+                "type": "info",
+                "text": "🎓 스토리가 이미 종료되었습니다! 다시 시작하려면 페이지를 새로고침해주세요."
+            }
+
         if self.state["current_event_index"] >= len(self.story_events):
-            return "🎓 스토리가 모두 끝났어요! 다시 하려면 새로고침해주세요."
-        # 현재 이벤트에서 선택을 했는지 확인
+            self.story_finished = True
+            return self.determine_final_major()
+
         if not self.state["current_choice_made"]:
-            return "현재 이벤트에서 선택을 먼저 해야 다음 스토리로 진행할 수 있습니다. 원하는 선택지를 선택해주세요."
-        
-        # 다음 이벤트로 이동
+            # ✅ 첫 스토리 진입이면 이벤트 출력
+            if self.state["current_event_index"] == 0:
+                event_info = self.display_current_event()
+                return {
+                    "type": "story",
+                    "text": f"🎓 '{event_info['name']}' 이벤트를 시작합니다!",
+                    "event": event_info,
+                    "image_url": f"/static/images/story/{event_info['name']}.jpg"
+                }
+            else:
+                return {
+                    "type": "warning",
+                    "text": "현재 이벤트에서 선택을 먼저 해야 다음 스토리로 진행할 수 있습니다. 원하는 선택지를 선택해주세요."
+                }
+
         self.state["current_event_index"] += 1
-        self.state["current_choice_made"] = False  # 새 이벤트에서는 아직 선택을 하지 않음
-        
+        self.state["current_choice_made"] = False
+
         if self.state["current_event_index"] >= len(self.story_events):
-            # 스토리 종료 (전공 선택 이벤트)
-            result = self.determine_final_major()
-            return result
-        
-        # 새 이벤트 정보 추가
+            self.story_finished = True
+            return self.determine_final_major()
+
         new_event = self.story_events[self.state["current_event_index"]]
-        return f"{new_event} 이벤트가 시작되었습니다."
-        
+        event_info = self.display_current_event()
+
+        return {
+            "type": "story",
+            "text": f"✅ '{new_event}' 이벤트가 시작되었습니다.",
+            "event": event_info,
+            "image_url": f"/static/images/story/{new_event}.jpg"
+        }
+    
     def process_choice(self, choice_num):
         """선택지를 처리합니다."""
         current_event = self.story_events[self.state["current_event_index"]]
@@ -403,22 +427,28 @@ class AllosChat:
             return "유효하지 않은 선택지입니다. 목록에서 번호를 선택해주세요."
             
     def determine_final_major(self):
-        """최종 전공을 결정합니다."""
-        # 스탯을 기반으로 최종 전공 결정
+        """최종 전공을 결정하고 구조화된 응답을 반환합니다."""
         stats = self.state["major_stats"]
+        self.story_finished = True
         final_major = max(stats, key=stats.get)
-        result = f"\n축하합니다! 알로스는 {final_major} 전공을 선택했습니다!\n"
-        result += f"최종 스탯: {stats}\n"
-        
-        # 최종 전공 정보 저장 및 AI 컨텍스트에 추가
+
+        # 최종 전공 기록
         self.state["choices_history"]["최종전공"] = {"choice": final_major}
         self.update_ai_context()
-        
-        # 모델에게 최종 전공 알리기
-        final_major_message = f"[시스템: 알로스는 최종적으로 '{final_major}' 전공을 선택했습니다. 앞으로의 대화에서 이 정보를 인지하고 참조하세요.]"
+
+        final_major_message = (
+            f"[시스템: 알로스는 최종적으로 '{final_major}' 전공을 선택했습니다. "
+            "앞으로의 대화에서 이 정보를 인지하고 참조하세요.]"
+        )
         self.messages.append({"role": "system", "content": final_major_message})
-        
-        return result
+
+        return {
+            "type": "ending",
+            "final_major": final_major,
+            "final_stats": stats,
+            "text": f"🎓 축하합니다! 알로스는 '{final_major}' 전공을 선택했습니다!",
+            "image_url": f"/static/images/ending/{final_major}.jpg"
+        }
 
     def show_status(self):
         current_event = self.story_events[self.state["current_event_index"]]
@@ -509,32 +539,38 @@ class AllosChat:
             
         elif user_input.lower() == "/스토리":
             result = self.advance_story()
-            if "다음 이벤트로 진행할 수 있습니다" not in result:
-                event_info = self.display_current_event()
-                return {
-                    "type": "story",
-                    "text": result,
-                    "event": event_info
-                }, ""
-            return {
-                "type": "story",
-                "text": result
-            }, ""
+            return result, ""  # 항상 튜플 반환 보장
             
         elif user_input.lower().startswith("/선택"):
-                try:
-                    choice_num = int(user_input.split()[1]) - 1
-                    result = self.process_choice(choice_num)
-                    
-                    # 마지막 이벤트인 경우 특별 처리
-                    if "유효하지 않은 선택지" not in result:
-                        if self.state["current_event_index"] == len(self.story_events) - 1 and self.state["current_choice_made"]:
-                            # 전공 선택 이벤트에서 선택을 했으면 바로 결과로
-                            final_result = self.determine_final_major()
-                            return result + "\n" + final_result, ""
-                    return result, ""
-                except (IndexError, ValueError):
-                    return "선택 명령어는 '/선택 [번호]' 형식으로 입력해주세요.", ""
+            try:
+                if self.story_finished:
+                    return {
+                        "type": "error",
+                        "text": "스토리가 이미 종료되었어요. 더 이상 선택할 수 없어요."
+                    }, ""
+
+                choice_num = int(user_input.split()[1]) - 1
+                result_text = self.process_choice(choice_num)
+
+                # 마지막 이벤트에서 선택 후 바로 엔딩 출력
+                if (
+                    self.state["current_event_index"] == len(self.story_events) - 1
+                    and self.state["current_choice_made"]
+                ):
+                    final_result = self.determine_final_major()
+                    final_result["choice_text"] = result_text  # 선택 메시지도 함께 포함
+                    return final_result, ""
+
+                return {
+                    "type": "choice",
+                    "text": result_text
+                }, ""
+
+            except (IndexError, ValueError):
+                return {
+                    "type": "error",
+                    "text": "선택 명령어는 '/선택 [번호]' 형식으로 입력해주세요."
+                }, ""
         else:
             # 일반 대화 처리
             return self.generate_ai_response(user_input)
