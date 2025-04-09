@@ -269,14 +269,18 @@ function appendBotMessage(data) {
 
   // === 감정 분석 ===
   if (data.emotion) {
-    const emotionDiv = document.createElement('div');
-    emotionDiv.classList.add('emotion-tag');
-    const emoji = data.emotion.emoji || '';
-    const emotion = data.emotion.dominant_emotion || '';
-    emotionDiv.textContent = `${emoji} ${emotion}`;
-    messageContainer.appendChild(emotionDiv);
+    // 감정 이미지만 표시하고 텍스트 태그는 생략
+    if (data.emotion.image_url) {
+      const emotionImg = document.createElement('img');
+      emotionImg.src = data.emotion.image_url;
+      emotionImg.alt = `${data.emotion.dominant_emotion} 감정`;
+      emotionImg.classList.add('emotion-image');
+      emotionImg.style.width = '50%';
+      emotionImg.style.display = 'block';
+      emotionImg.style.margin = '10px auto';
+      messageContainer.appendChild(emotionImg);
+    }
   }
-
   // === 힌트 ===
   if (data.hint) {
     const hintDiv = document.createElement('div');

@@ -332,16 +332,67 @@
     <div class="modal-content">
       <button class="modal-close" data-close-modal="imageModal">&times;</button>
       <h2>그림 보기</h2>
+      <<h3>메인 이미지</h3>
       <div class="image-grid">
+        <img src="{{ url_for('static', filename='images/chatbot4/gn관.jpg') }}" alt="GN관">
         <img src="{{ url_for('static', filename='images/chatbot4/photo1.png') }}" alt="Photo 1">
         <img src="{{ url_for('static', filename='images/chatbot4/photo2.png') }}" alt="Photo 2">
         <img src="{{ url_for('static', filename='images/chatbot4/photo3.png') }}" alt="Photo 3">
         <img src="{{ url_for('static', filename='images/chatbot4/photo4.png') }}" alt="Photo 4">
+        <img src="{{ url_for('static', filename='images/chatbot4/thumbnail.png') }}" alt="썸네일">
+        <img src="{{ url_for('static', filename='images/chatbot4/thumbnail2.png') }}" alt="썸네일2">
+        <img src="{{ url_for('static', filename='images/chatbot4/가브리엘관.jpg') }}" alt="가브리엘관">
+        <img src="{{ url_for('static', filename='images/chatbot4/교실.png') }}" alt="교실">
+        <img src="{{ url_for('static', filename='images/chatbot4/놀란알로.png') }}" alt="놀란알로">
+        <img src="{{ url_for('static', filename='images/chatbot4/다산관.jpg') }}" alt="다산관">
+        <img src="{{ url_for('static', filename='images/chatbot4/도서관.jpg') }}" alt="도서관">
+        <img src="{{ url_for('static', filename='images/chatbot4/리치과학관.jpg') }}" alt="리치과학관">
+        <img src="{{ url_for('static', filename='images/chatbot4/알바트로스탑.jpg') }}" alt="알바트로스탑">
+        <img src="{{ url_for('static', filename='images/chatbot4/덜기쁜알로.png') }}" alt="덜기쁜알로">
+        <img src="{{ url_for('static', filename='images/chatbot4/덜슬픈알로.png') }}" alt="덜슬픈알로">
+        <img src="{{ url_for('static', filename='images/chatbot4/이알로_교실.png') }}" alt="이알로_교실">
+        <img src="{{ url_for('static', filename='images/chatbot4/이알로_엠마오.png') }}" alt="이알로_엠마오">
+        <img src="{{ url_for('static', filename='images/chatbot4/정하상관.jpg') }}" alt="정하상관">
+        <img src="{{ url_for('static', filename='images/chatbot4/청년광장.jpg') }}" alt="청년광장">
+      </div>
+      
+      <!-- emotions 폴더 이미지 -->
+      <h3>감정 표현</h3>
+      <div class="image-grid">
+        <img src="{{ url_for('static', filename='images/chatbot4/emotions/anxious.jpg') }}" alt="불안한">
+        <img src="{{ url_for('static', filename='images/chatbot4/emotions/confused.jpg') }}" alt="혼란스러운">
+        <img src="{{ url_for('static', filename='images/chatbot4/emotions/excited.jpg') }}" alt="신나는">
+        <img src="{{ url_for('static', filename='images/chatbot4/emotions/happy.jpg') }}" alt="행복한">
+        <img src="{{ url_for('static', filename='images/chatbot4/emotions/neutral.jpg') }}" alt="중립적인">
+        <img src="{{ url_for('static', filename='images/chatbot4/emotions/sad.jpg') }}" alt="슬픈">
+      </div>
+      
+      <!-- ending 폴더 이미지 -->
+      <h3>엔딩</h3>
+      <div class="image-grid">
+        <img src="{{ url_for('static', filename='images/chatbot4/ending/경영경제.jpg') }}" alt="경영경제">
+        <img src="{{ url_for('static', filename='images/chatbot4/ending/공과자연.jpg') }}" alt="공과자연">
+        <img src="{{ url_for('static', filename='images/chatbot4/ending/인문.jpg') }}" alt="인문">
+        <img src="{{ url_for('static', filename='images/chatbot4/ending/사회과학.jpg') }}" alt="사회과학">
+        
+        <img src="{{ url_for('static', filename='images/chatbot4/ending/지융미.jpg') }}" alt="지융미">
+      </div>
+      
+      <!-- story 폴더 이미지 -->
+      <h3>스토리</h3>
+      <div class="image-grid">
+        <img src="{{ url_for('static', filename='images/chatbot4/story/동아리거리제.jpg') }}" alt="동아리거리제">
+        <img src="{{ url_for('static', filename='images/chatbot4/story/방학.jpg') }}" alt="방학">
+        <img src="{{ url_for('static', filename='images/chatbot4/story/수강과목선택.jpg') }}" alt="수강과목선택">
+        <img src="{{ url_for('static', filename='images/chatbot4/story/시험기간.jpg') }}" alt="시험기간">
+        <img src="{{ url_for('static', filename='images/chatbot4/story/시험당일.jpg') }}" alt="시험당일">
+        <img src="{{ url_for('static', filename='images/chatbot4/story/자율전공입학.jpg') }}" alt="자율전공입학">
+        <img src="{{ url_for('static', filename='images/chatbot4/story/전공선택.jpg') }}" alt="전공선택">
+        <img src="{{ url_for('static', filename='images/chatbot4/story/축제.jpg') }}" alt="축제">
       </div>
     </div>
   </div>
   {% endif %}
-
   <script>
     // JS 파일이 한 번만 로드되도록 확인
     if (!window.chatbotScriptLoaded) {

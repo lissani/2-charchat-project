@@ -699,10 +699,11 @@ def generate_response(user_message):
 
             emotion_data = None
             if allos.last_emotion_result and allos.should_display_image(allos.last_emotion_result):
+                dominant_emotion = allos.last_emotion_result["dominant_emotion"]
                 emotion_data = {
                     "dominant_emotion": allos.last_emotion_result["dominant_emotion"],
                     "confidence": allos.last_emotion_result["confidence"],
-                    "emoji": get_emotion_emoji(allos.last_emotion_result["dominant_emotion"])
+                    "image_url": f"/static/images/chatbot4/emotions/{dominant_emotion}.jpg"
                 }
 
             return {
