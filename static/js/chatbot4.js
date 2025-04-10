@@ -20,15 +20,10 @@ async function sendMessage() {
   const loadingElem = document.createElement('div');
   loadingElem.classList.add('message', 'bot', 'loading');
 
-  const botImg = document.createElement('img');
-  botImg.classList.add('bot-big-img');
-  botImg.alt = "챗봇 이미지";
-
   const loadingText = document.createElement('div');
   loadingText.classList.add('bot-text');
   loadingText.textContent = "...";
 
-  loadingElem.appendChild(botImg);
   loadingElem.appendChild(loadingText);
   chatLog.appendChild(loadingElem);
   chatLog.scrollTop = chatLog.scrollHeight;

@@ -332,15 +332,15 @@
     <div class="modal-content">
       <button class="modal-close" data-close-modal="imageModal">&times;</button>
       <h2>그림 보기</h2>
-      <<h3>메인 이미지</h3>
+      
+      <h3>썸네일</h3>
+      <div class="image-grid">
+        <img src="{{ url_for('static', filename='images/chatbot4/thumbnail.png') }}" alt="썸네일">
+      </div>
+
+      <h3>메인 이미지</h3>
       <div class="image-grid">
         <img src="{{ url_for('static', filename='images/chatbot4/gn관.jpg') }}" alt="GN관">
-        <img src="{{ url_for('static', filename='images/chatbot4/photo1.png') }}" alt="Photo 1">
-        <img src="{{ url_for('static', filename='images/chatbot4/photo2.png') }}" alt="Photo 2">
-        <img src="{{ url_for('static', filename='images/chatbot4/photo3.png') }}" alt="Photo 3">
-        <img src="{{ url_for('static', filename='images/chatbot4/photo4.png') }}" alt="Photo 4">
-        <img src="{{ url_for('static', filename='images/chatbot4/thumbnail.png') }}" alt="썸네일">
-        <img src="{{ url_for('static', filename='images/chatbot4/thumbnail2.png') }}" alt="썸네일2">
         <img src="{{ url_for('static', filename='images/chatbot4/가브리엘관.jpg') }}" alt="가브리엘관">
         <img src="{{ url_for('static', filename='images/chatbot4/교실.png') }}" alt="교실">
         <img src="{{ url_for('static', filename='images/chatbot4/놀란알로.png') }}" alt="놀란알로">

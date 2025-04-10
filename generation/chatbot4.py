@@ -156,9 +156,9 @@ class AllosChat:
         sorted_emotions = sorted(all_emotions.items(), key=lambda x: x[1], reverse=True)
         second_emotion_value = sorted_emotions[1][1]
         
-        # 주요 감정과 두 번째 감정의 차이가 0.1 이상인지 확인
+        # 주요 감정과 두 번째 감정의 차이 확인
         difference = confidence - second_emotion_value
-        threshold_difference = 0.1
+        threshold_difference = 0.05
         
         if difference >= threshold_difference:
             return True
@@ -700,7 +700,7 @@ def generate_response(user_message):
             emotion_data = None
             if allos.last_emotion_result and allos.should_display_image(allos.last_emotion_result):
                 dominant_emotion = allos.last_emotion_result["dominant_emotion"]
-                emotion_data = {
+                emotion_data =  {
                     "dominant_emotion": allos.last_emotion_result["dominant_emotion"],
                     "confidence": allos.last_emotion_result["confidence"],
                     "image_url": f"/static/images/chatbot4/emotions/{dominant_emotion}.jpg"
