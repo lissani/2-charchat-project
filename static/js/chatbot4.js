@@ -341,8 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const commands = [
       { label: "/스토리", desc: "알로스의 대학 생활을 함께 진행해요!" },
       { label: "/상태", desc: "지금까지의 선택과 전공 스탯을 볼 수 있어요" },
-      { label: "/도움말", desc: "사용 가능한 명령어들을 안내해드려요" },
-      { label: "/종료", desc: "챗봇을 종료해요" }
+      { label: "/도움말", desc: "사용 가능한 명령어들을 안내해드려요" }
     ];
     
     commands.forEach(cmd => {

@@ -47,7 +47,7 @@ class AllosChat:
                 ])
                 
                 # GPT 모델 구성
-                self.llm = ChatOpenAI(model="gpt-4o-mini", openai_api_key=self.api_key)
+                self.llm = ChatOpenAI(model="gpt-4o", openai_api_key=self.api_key)
                 
                 # RetrievalQA 체인 구성
                 self.qa_chain = RetrievalQA.from_chain_type(
@@ -351,7 +351,7 @@ class AllosChat:
         if self.story_finished:
             return {
                 "type": "info",
-                "text": "🎓 스토리가 이미 종료되었습니다! 다시 시작하려면 페이지를 새로고침해주세요."
+                "text": "🎓 스토리가 이미 종료되었습니다!"
             }
 
         if self.state["current_event_index"] >= len(self.story_events):
@@ -495,8 +495,7 @@ class AllosChat:
                 {"command": "/스토리", "description": "스토리 진행", "example": "/스토리"},
                 {"command": "/선택 [번호]", "description": "선택하기", "example": "/선택 1"},
                 {"command": "/상태", "description": "현재 상태 확인", "example": "/상태"},
-                {"command": "/도움말", "description": "도움말 보기", "example": "/도움말"},
-                {"command": "/종료", "description": "챗봇 종료", "example": "/종료"}
+                {"command": "/도움말", "description": "도움말 보기", "example": "/도움말"}
             ]
         }
 
@@ -516,7 +515,7 @@ class AllosChat:
                     # 오류 시 기본 GPT 사용
                     self.messages.append({"role": "user", "content": user_input})
                     completion = self.client.chat.completions.create(
-                        model="gpt-4o-mini",
+                        model="gpt-4o",
                         messages=self.messages
                     )
                     assistant_response = completion.choices[0].message.content
@@ -525,7 +524,7 @@ class AllosChat:
                 # 벡터 DB가 없거나 명령어인 경우 기본 GPT 사용
                 self.messages.append({"role": "user", "content": user_input})
                 completion = self.client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model="gpt-4o",
                     messages=self.messages
                 )
                 assistant_response = completion.choices[0].message.content
@@ -574,8 +573,7 @@ class AllosChat:
                     "commands": [
                         { "label": "/스토리", "desc": "알로스의 대학 생활을 함께 진행해요!" },
                         { "label": "/상태", "desc": "지금까지의 선택과 전공 스탯을 볼 수 있어요" },
-                        { "label": "/도움말", "desc": "사용 가능한 명령어들을 안내해드려요" },
-                        { "label": "/종료", "desc": "챗봇을 종료해요" }
+                        { "label": "/도움말", "desc": "사용 가능한 명령어들을 안내해드려요" }
                     ]
                 }
             }, ""
@@ -647,8 +645,7 @@ def generate_response(user_message):
                     "commands": [
                         { "label": "/스토리", "desc": "알로스의 대학 생활을 함께 진행해요!" },
                         { "label": "/상태", "desc": "지금까지의 선택과 전공 스탯을 볼 수 있어요" },
-                        { "label": "/도움말", "desc": "사용 가능한 명령어들을 안내해드려요" },
-                        { "label": "/종료", "desc": "챗봇을 종료해요" }
+                        { "label": "/도움말", "desc": "사용 가능한 명령어들을 안내해드려요" }
                     ]
                 }
             }
