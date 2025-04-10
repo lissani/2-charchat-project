@@ -1,4 +1,9 @@
-flask
+Flask
 openai
+langchain
+langchain-community
+langchain-openai
 python-dotenv
 numpy
+beautifulsoup4
+chromadb

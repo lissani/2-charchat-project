@@ -21,7 +21,7 @@ class AllosChat:
         self.client = openai.OpenAI(api_key=self.api_key)
         
         # 시스템 메시지 설정
-        self.system_message = """너는 서강대학교에 자율전공으로 입학한 새내기 여학생 '알로스'입니다. 
+        self.system_message = """너는 서강대학교에 자율전공으로 입학한 새내기 여학생 '이알로'입니다. 
 호기심이 많고 대학 생활에 적응하려고 노력 중입니다. 
 사용자는 너의 선배(뻔선)이고, 대학 생활에 대해 조언을 구하거나 고민을 나눕니다.
 서강대학교 캠퍼스와 학교생활(도서관, 강의실, 엠마오, 청광, 곤자가 플라자 등)에 대해 알고 있습니다.
@@ -212,7 +212,7 @@ class AllosChat:
         """이벤트 데이터를 초기화합니다."""
         return {
             "자율전공입학": {
-                "description": "알로스는 서강대학교 자율전공으로 입학했습니다. 캠퍼스 투어로 어디부터 가볼까요?",
+                "description": "이알로는 서강대학교 자율전공으로 입학했습니다. 캠퍼스 투어로 어디부터 가볼까요?",
                 "choices": ["R관", "J관", "GA관", "GN관", "D관", "청광"]
             },
             "수강과목선택": {
@@ -236,7 +236,7 @@ class AllosChat:
                 "choices": ["공연 관람하기", "친구들과 축제 즐기기", "축제 준비 도우미 참여", "집에 있는다"]
             },
             "방학": {
-                "description": "드디어 기다리던 여름방학! 알로스는 뭘 하면서 시간을 보낼까?",
+                "description": "드디어 기다리던 여름방학! 이알로는 뭘 하면서 시간을 보낼까?",
                 "choices": ["코딩 테스트 공부", "외국어 공부", "영화제 탐방", "주식 공부", "심리검사 받기", "알바하기"]
             },
             "전공선택": {
@@ -396,6 +396,10 @@ class AllosChat:
         current_event = self.story_events[self.state["current_event_index"]]
         choices = self.events_data[current_event]["choices"]
         
+        # ✅ 이미 선택했는지 확인
+        if self.state["current_choice_made"]:
+            return f"'{current_event}' 이벤트에서는 이미 선택을 완료했습니다. '/스토리'를 입력해 다음 이벤트로 진행해 주세요."
+        
         # 선택지 범위 확인
         if 0 <= choice_num < len(choices):
             chosen_action = choices[choice_num]
@@ -417,7 +421,7 @@ class AllosChat:
             self.update_ai_context()
             
             # 모델에게 선택 내용 알리는 메시지 추가
-            choice_message = f"[시스템: 알로스는 '{current_event}' 이벤트에서 '{chosen_action}'을(를) 선택했습니다. 앞으로의 대화에서 이 선택을 인지하고 참조하세요.]"
+            choice_message = f"[시스템: 이알로는 '{current_event}' 이벤트에서 '{chosen_action}'을(를) 선택했습니다. 앞으로의 대화에서 이 선택을 인지하고 참조하세요.]"
             self.messages.append({"role": "system", "content": choice_message})
             
             return f"{chosen_action}을(를) 선택했습니다!"
@@ -438,7 +442,7 @@ class AllosChat:
             self.update_ai_context()
 
             final_major_message = (
-                f"[시스템: 알로스는 최종적으로 서강대학교를 떠나 '{final_major}'를 결정했습니다. "
+                f"[시스템: 이알로는 최종적으로 서강대학교를 떠나 '{final_major}'를 결정했습니다. "
                 "앞으로의 대화에서 이 정보를 인지하고 참조하세요.]"
             )
             self.messages.append({"role": "system", "content": final_major_message})
@@ -447,7 +451,7 @@ class AllosChat:
                 "type": "ending",
                 "final_major": final_major,
                 "final_stats": stats,
-                "text": "🎓 알로스는 어떤 전공도 마음에 들지 않아 결국 서강대학교를 떠나 다른 학교로 반수하기로 결정했습니다!",
+                "text": "🎓 이알로는 어떤 전공도 마음에 들지 않아 결국 서강대학교를 떠나 다른 학교로 반수하기로 결정했습니다!",
                 "image_url": "/static/images/chatbot4/ending/반수.jpg"  # 반수 엔딩용 이미지 필요
             }
         # 최종 전공 기록
@@ -455,7 +459,7 @@ class AllosChat:
         self.update_ai_context()
 
         final_major_message = (
-            f"[시스템: 알로스는 최종적으로 '{final_major}' 전공을 선택했습니다. "
+            f"[시스템: 이알로는 최종적으로 '{final_major}' 전공을 선택했습니다. "
             "앞으로의 대화에서 이 정보를 인지하고 참조하세요.]"
         )
         self.messages.append({"role": "system", "content": final_major_message})
@@ -472,7 +476,7 @@ class AllosChat:
             "type": "ending",
             "final_major": final_major,
             "final_stats": stats,
-            "text": f"🎓 축하합니다! 알로스는 '{final_major}' 전공을 선택했습니다!",
+            "text": f"🎓 축하합니다! 이알로는 '{final_major}' 전공을 선택했습니다!",
             "image_url": image_url
         }
 
@@ -568,10 +572,10 @@ class AllosChat:
             return {
                 "type": "intro",
                 "text": {
-                    "title": "안녕하세요, 선배님! 저는 서강대학교 자율전공 새내기 '알로스'에요 🐣",
+                    "title": "안녕하세요, 선배님! 저는 서강대학교 자율전공 새내기 '이알로'에요 🐣",
                     "description": "💡 챗봇 사용법",
                     "commands": [
-                        { "label": "/스토리", "desc": "알로스의 대학 생활을 함께 진행해요!" },
+                        { "label": "/스토리", "desc": "이알로의 대학 생활을 함께 진행해요!" },
                         { "label": "/상태", "desc": "지금까지의 선택과 전공 스탯을 볼 수 있어요" },
                         { "label": "/도움말", "desc": "사용 가능한 명령어들을 안내해드려요" }
                     ]
@@ -640,10 +644,10 @@ def generate_response(user_message):
             return {
                 "type": "intro",
                 "text": {
-                    "title": "안녕하세요, 선배님! 저는 서강대학교 자율전공 새내기 '알로스'에요 🐣",
+                    "title": "안녕하세요, 선배님! 저는 서강대학교 자율전공 새내기 '이알로'에요 🐣",
                     "description": "💡 챗봇 사용법",
                     "commands": [
-                        { "label": "/스토리", "desc": "알로스의 대학 생활을 함께 진행해요!" },
+                        { "label": "/스토리", "desc": "이알로의 대학 생활을 함께 진행해요!" },
                         { "label": "/상태", "desc": "지금까지의 선택과 전공 스탯을 볼 수 있어요" },
                         { "label": "/도움말", "desc": "사용 가능한 명령어들을 안내해드려요" }
                     ]

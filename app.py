@@ -32,7 +32,7 @@ def index():
             'id': 4,
             'name': '내 뻔후는 알로스',
             'image': url_for('static', filename='images/chatbot4/thumbnail.png'),
-            'tags': ['#서강대', '#자유전공학부', '#알로스']
+            'tags': ['#알바트로스탑에서_나온', '#전공선택고민', '#캠퍼스_생존기']
         }
     ]
     return render_template('index.html', chatbots=chatbots)
