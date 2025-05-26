@@ -1,101 +1,70 @@
-# 2-charchat-project
+# 🐦 내 뻔후는 알로스
 
-2기 OpenAI API와 RAG를 활용한 캐릭터 챗봇 프로젝트
+**서강대학교 마스코트 알바트로스 '이알로'를 주인공으로 한 키우기형 AI 챗봇 프로젝트**
 
-1팀 - 왕현성, 구종빈, 이장미, 배진아   
-2팀 - 김도훈, 이상우, 김진서, 오영은   
-3팀 - 김민우, 정한결, 김도연, 정유진   
-4팀 - 정희선, 강병무, 김우태, 황인영   
+알로스는 서강대 자유전공학부로 입학한 1학년 신입생으로,  
+대학생활 적응과 전공 선택을 고민하는 과정을 통해 사용자의 선택에 따라 다양한 엔딩이 결정됩니다.
 
-------
-## 팀별 수정사항
+---
 
-**주의: 아래에 해당하는 파일과 각 팀 번호에 해당하는 부분이나 폴더만 수정 (불가피한 전체 코드 수정 시 문의)**
+## 📌 주요 기능
 
-## 1. app.py - 각 팀별 개인화면 설정
+- **일반 대화 모드**: 알로스와 자유롭게 일상 대화 가능
+- **스토리 진행 모드**: 8개의 선택형 이벤트를 통해 이알로의 대학생활과 전공 선택 여정 진행
+- **감정 분석 기반 표정 출력**: 사용자의 입력을 바탕으로 알로스의 감정을 시각적으로 표현
+- **마우스 명령어 기반 상호작용**: `/선택`, `/스토리`, `/상태`, `/종료` 등의 명령어 지원
+- **누적 선택 스탯에 따라 전공이 결정되는 다중 엔딩 시스템**
 
-팀 번호에 맞게 chatbot_data(또는 비슷한 딕셔너리) 내에 이름, ID, 라우트 등을 정확히 수정합니다.
+---
 
-### 썸네일 이미지 추가(1:1 비율)
+## 🎨 캐릭터: 이알로
 
-- static/images/ 아래에 본인의 챗봇 썸네일 이미지를 준비하고, app.py에서 url_for('static', filename='images/...') 부분을 팀 이름/번호에 맞게 변경해 주세요.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a66ab28b-93c8-468c-a43f-3d036a9ce185" width="300"/>
+  <img src="https://github.com/user-attachments/assets/e353b237-98ac-42a9-b17d-9cfdb52eef8e" width="300"/>
+  <img src="https://github.com/user-attachments/assets/e060f438-9ff5-41bd-97eb-5fed35d31c20" width="300"/>
+</p>
 
-### 챗봇 설명 작성:
+- **나이**: 20세 (만 18세)
+- **전공**: 자유전공학부 25학번
+- **성격**: 호기심 많고 해맑음
+- **특이사항**: 알바트로스를 닮았다는 소문 / 무슨 전공을 선택할지 고민 중
 
-- 약 4~5줄 정도의 문장으로 구성하여, 캐릭터 특징을 잘 드러내고, 어떤 대화를 할 수 있는 챗봇인지 요약합니다.
+---
 
-### 태그 작성(3~4개 권장):
+## 🌍 세계관
 
-- 예: ['#코미디', '#액션', '#반전', '#일상'] 같은 식으로 챗봇 성격을 간단하게 표현할 태그들을 작성합니다.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ca7d5532-626c-4afa-87e5-784fa0fc83d2" width="300"/>
+  <img src="https://github.com/user-attachments/assets/98298977-6c04-456f-bf16-978d27f7dbfc" width="300"/>
+  <img src="https://github.com/user-attachments/assets/c4328ee4-1426-43bd-939a-e64293a454ad" width="300"/>
+</p>
 
+전지적 화석 시점으로 알로스가 캠퍼스에 내려와 인간으로 살아가는  
+"서강대 캠퍼스 생존기"라는 콘셉트로 구성된 스토리 기반 챗봇입니다.  
+사용자는 알로스의 선택을 도와가며 성장과 갈등을 함께 경험하게 됩니다.
 
-## 2. templates/chat.html
+---
 
-### 비디오 경로 확인 및 추가:
+## 📱 예시 화면
 
-- chat.html에서 video 태그의 src 경로를 본인의 팀 챗봇 영상으로 교체합니다.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ec89d711-9ec4-4095-b50d-05db3541813d" width="500"/>
+  <img src="https://github.com/user-attachments/assets/ec6178fa-d7e4-455e-9bca-3cdf232e49b5" width="500"/>
+</p>
 
-- 예: <source src="{{ url_for('static', filename='videos/chatbotX/...') }}" ...>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5a0180da-4d0b-4831-9845-fbdc36624706" width="500"/>
+  <img src="https://github.com/user-attachments/assets/d528bf5f-1357-48f9-97e7-c4aa6ac83328" width="500"/>
+</p>
 
-### 이미지 경로 확인 및 추가:
+---
 
-- 백엔드 연동 없이, 정적으로 img src="..." 부분을 하나씩 수정해야 합니다.
+## 🛠 기술 스택
 
-- 갤러리에 보여줄 이미지를 static/images/chatbotX/ 폴더에 넣고, chat.html의 <img> 경로를 적절히 바꿔주세요.
+- Python / FastAPI
+- GPT API (LLM 활용)
+- Emotion Classification
+- 프론트엔드: HTML/CSS/JavaScript (또는 Streamlit/Flask 등 UI 방식 명시)
+- 캐릭터 이미지 기반 인터랙션 및 멀티 엔딩 처리 로직 구현
 
-
-## 3. generation/chatbot@.py
-
-### 응답 및 임베딩 비교 코드:
-
-- OpenAI API를 활용한 답변 생성과, 임베딩을 통한 유사도 계산(또는 RAG 등) 로직을 모두 이 파일에 작성합니다.
-
-- 예: generate_response(user_message) 함수 안에서 임베딩 -> 유사도 검색 -> ChatCompletion 호출 과정을 구현.
-
-### OpenAI API Key 사용:
-
-- 공용으로 쓰는 API 키(또는 팀별 키)를 이곳에서 불러와 설정합니다.
-
-- .env 파일이나 환경변수를 통해 안전하게 관리하세요.
-
-
-## 4. static/js/chatbot@.js
-
-### JS-파이썬 매핑:
-
-- 이 JS 파일은 chat.html에서 동적으로 로드되어, **사용자 메시지를 /api/chat**으로 보내고, 서버(파이썬) 응답을 화면에 표시하는 역할을 합니다.
-
-- chatbot1.js 참고:
-
-    - 기본 메시지 전송 로직(이벤트 리스너, fetch API, DOM 업데이트)은 chatbot1.js를 예시로 삼으면 됩니다.
-
-    - 단, 현재 예시는 임의의 이미지를 항상 출력하도록 되어 있으니, 팀 챗봇 캐릭터 이미지로 교체하고 싶다면 해당 부분을 수정하세요.
-
-    - 추가적으로, 응답 형태나 포맷이 달라질 경우(예: JSON 구조 변경), 그에 맞게 프런트 처리 로직도 수정해야 합니다.
-
-
-## 5. data 폴더 / static 하위 폴더
-
-### 임베딩 벡터 / 필요한 데이터 저장:
-
-- 각 팀은 data/chatbot@/ 형태로 폴더를 만들어, 여기에 임베딩 결과(json 등)나 기타 필요한 텍스트, 이미지, 스크립트 파일 등을 저장합니다.
-
-- chatbot@.py에서 임베딩 데이터를 불러올 때도 이 경로를 맞춰주세요.
-
-
-## 6. 추가 패키지 requirements.txt
-
-### 임베딩 패키지, 기타 라이브러리:
-
-- 예: numpy, pandas, openai, scikit-learn 등등.
-
-- 새로운 라이브러리를 사용하면, 반드시 requirements.txt에 추가하여 다른 팀원/환경에서도 동일한 버전으로 설치 가능하도록 해주세요.
-
-
-## 그 밖에 권장사항
-
-- .gitignore: API 키나 민감 파일이 유출되지 않도록 .gitignore 설정도 점검해 주세요.
-
-- 버전 관리: 각 팀원 간에 충돌이 많지 않도록, pull/push 전후로 branch 관리를 꼼꼼히 해주세요.
-
-- UI/UX 개선 건의: 필요하다면 스타일 수정, 대화 구조(봇 이미지를 왼쪽, 유저 메시지를 오른쪽 등)도 팀별로 자유롭게 건의 가능합니다.
