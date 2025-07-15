@@ -65,6 +65,6 @@
 - Python / FastAPI
 - GPT API (LLM 활용)
 - Emotion Classification
-- 프론트엔드: HTML/CSS/JavaScript (또는 Streamlit/Flask 등 UI 방식 명시)
+- 프론트엔드: HTML/CSS/JavaScript
 - 캐릭터 이미지 기반 인터랙션 및 멀티 엔딩 처리 로직 구현
 
